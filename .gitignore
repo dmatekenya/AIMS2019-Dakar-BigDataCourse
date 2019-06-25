@@ -1,0 +1,29 @@
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# all PPTX as they are usually very big
+*.pptx
+
+# all PDFs 
+*.pdf
+
+# docs folder
+docs/
+
+# package installation folder
+package-installation/
+
+# solutions notebook
+solution-notebooks/
+
+
+
+
+
