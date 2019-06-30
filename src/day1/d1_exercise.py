@@ -112,7 +112,7 @@ def count_number_of_csv_files(input_folder=None):
     # [YOUR CODE HERE]
 
 
-def save_list_to_csv_file(list=None, csvfile_full_path=None):
+def save_list_to_csv(lst=None, csvfile_path=None):
     """
     Given a list (which can be nested), write elements of the list to a CSV file.
     Example
@@ -122,20 +122,21 @@ def save_list_to_csv_file(list=None, csvfile_full_path=None):
     like below:
     'a', 'X', 'z'
     '1', '2', '3'
-    :param list:
-    :param csvfile_full_path:
+    :param lst: List with items to write. Note that it can be a nested list
+    :param csvfile_path: full path of CSV file, when testing, dont forget extension
     :return:
     """
-
     # to avoid some problems later, lets remove the file if it exist
-    # use if statement and function 'remove' from os module
+    # use if statement and function 'remove()' from os module to achiev this
+    # [YOUR CODE HERE]
 
+    # open file object for writing with option "w+"
+    # [YOUR CODE HERE]
 
-    # use list indexing and object type checking
-    # see if the list is nested list or not
+    # how you write depends on whether the list is nested or not
+    # to check is list is nested, use function "isinstance()" to check
+    # if elements of the list are also lists
+    # [YOUR CODE HERE]
 
-    # open file object for writing
-
-    # start writing
-
-    # close file object after writing
+    # close file object
+    # [YOUR CODE HERE]

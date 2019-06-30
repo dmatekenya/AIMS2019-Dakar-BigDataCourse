@@ -1,23 +1,15 @@
 import os
 from importlib import reload
-import time
 import shutil
 import numpy as np
 import pandas as pd
-import sys
-
-sys.path.append('/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/solution-notebooks/')
-
-try:
-    from solution-notebooks import d1_solution
-except ImportError:
-    pass
 
 
 DAY = 1
 MARKING_SCHEME = {'return_element_of_a_list': 2, 'calculate_average': 4,
                   'concatenate_strings': 2, 'check_if_list_contains_item': 2,
                   'save_list_to_csv_file':4, 'count_number_of_csv_files': 2}
+TOTAL_SCORE = np.sum(list(MARKING_SCHEME.values()))
 
 
 TEST_INPUTS = {'return_element_of_a_list': (['a', 'X', 'z', 10, 30], -1),
@@ -29,34 +21,34 @@ TEST_INPUTS = {'return_element_of_a_list': (['a', 'X', 'z', 10, 30], -1),
                ["Central","2","Ntchisi","Rural","203"]]}
 
 
-def get_responses_and_record(sol):
+def get_responses_and_record(student_sol=None, sol=None):
     total_marks = 0
     for k, v in TEST_INPUTS.items():
         # run function
         if k == 'return_element_of_a_list':
             i = v[1]
             lst = v[0]
-            output = sol.return_element_of_a_list(lst, i)
+            output = student_sol.return_element_of_a_list(lst, i)
 
             # check if its correct
             if output == lst[i]:
                 total_marks += MARKING_SCHEME[k]
         elif k == 'calculate_average':
-            output = sol.calculate_average(v)
+            output = student_sol.calculate_average(v)
             # check if its correct
             if output == np.mean(v):
                 total_marks += MARKING_SCHEME[k]
         elif k == 'concatenate_strings':
             first = v[0]
             last = v[1]
-            output = sol.concatenate_strings(first, last)
+            output = student_sol.concatenate_strings(first, last)
             if output == "{}  {}".format(first, last):
                 total_marks += MARKING_SCHEME[k]
 
         elif k == 'check_if_list_contains_item':
             item = v[1]
             lst = v[0]
-            output = sol.check_if_list_contains_item(lst, item)
+            output = student_sol.check_if_list_contains_item(lst, item)
             if item in lst:
                 actual = 'YES'
             else:
@@ -65,16 +57,16 @@ def get_responses_and_record(sol):
             if output == actual:
                 total_marks += MARKING_SCHEME[k]
         elif k == 'count_number_of_csv_files':
-            correct = d1_solution.count_number_of_csv_files(input_folder=v)
-            output = sol.count_number_of_csv_files(input_folder=v)
+            correct = sol.count_number_of_csv_files(input_folder=v)
+            output = student_sol.count_number_of_csv_files(input_folder=v)
             if output == correct:
                 total_marks += MARKING_SCHEME[k]
         elif k == 'save_list_to_csv_file':
             out_csv_d = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvDun.csv'
             out_csv_p = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvP.csv'
 
-            d1_solution.save_list_to_csv_file(list=v, csvfile_full_path=out_csv_d)
-            sol.save_list_to_csv_file(list=v, csvfile_full_path=out_csv_p)
+            sol.save_list_to_csv(lst=v, csvfile_path=out_csv_d)
+            student_sol.save_list_to_csv(lst=v, csvfile_path=out_csv_p)
 
             dfd = pd.read_csv(out_csv_d)
             dfp = pd.read_csv(out_csv_p)
@@ -88,33 +80,47 @@ def get_responses_and_record(sol):
 
 def grade_scripts(candidates_solutions_folder=None):
 
+    # load teacher solutions
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    instructor_script = os.path.join('/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/solution_notebooks/',
+                                     'd1_solution.py')
+    shutil.copy(instructor_script, os.path.join(current_dir, 'd1_solution.py'))
+    try:
+        import d1_solution as sol
+        sol = reload(sol)
+    except ImportError as e:
+        pass
+    
     lst = os.listdir(candidates_solutions_folder)
     res = []
 
     for l in lst:
         try:
-            # get students name
-            first = l.split('_')[0]
-            last = l.split('_')[1][:-3]
+            if l.endswith('py'):
+                # get students name
+                first = l.split('_')[0]
+                last = l.split('_')[1][:-3]
 
-            # copy module to mai folder and rename it
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            os.remove(os.path.join(current_dir, 'candidate_solutions.py'))
-            new_solutions_script_path = os.path.join(candidates_solutions_folder, l)
-            dest_file = os.path.join(current_dir, 'candidate_solutions.py')
-            shutil.copy(new_solutions_script_path, dest_file)
+                # copy module to mai folder and rename it
+                if os.path.exists(os.path.join(current_dir, 'candidate_solutions.py')):
+                    os.remove(os.path.join(current_dir, 'candidate_solutions.py'))
 
-            # run script
-            import candidate_solutions as sol
-            sol = reload(sol)
-            score = get_responses_and_record(sol)
+                new_solutions_script_path = os.path.join(candidates_solutions_folder, l)
+                dest_file = os.path.join(current_dir, 'candidate_solutions.py')
+                shutil.copy(new_solutions_script_path, dest_file)
 
-            # print results
-            print('Participant name: {} {}, score: {}'.format(first, last, score))
-            res.append({'firstName': first, 'lastName': last, 'score': score, 'day': DAY,
-                        'totalScore': np.sum(list(MARKING_SCHEME.values()))})
+                # run script
+                import candidate_solutions as student_sol
+                student_sol = reload(student_sol)
+                score = get_responses_and_record(student_sol=student_sol, sol=sol)
+
+                # print results
+                print('Participant name: {} {}, score: {} out of {}'.format(first, last, score, TOTAL_SCORE))
+                res.append({'firstName': first, 'lastName': last, 'score': score, 'day': DAY,
+                            'totalScore': TOTAL_SCORE})
         except Exception as e:
             print(e)
+            print('FAILED TO GRADE THE THIS PARTICIPANT: {} {}'.format(first, last))
             continue
 
     return res
