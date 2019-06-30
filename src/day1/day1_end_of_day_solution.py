@@ -3,25 +3,15 @@ GENERAL INSTRUCTIONS
 WARNING: For Python beginners:
 the instructions here will only make sense after you have gone through and
 completed the training materials.
-
-1. WHICH PART TO CHANGE?: Uncomment every line with  [YOUR CODE HERE] and replace it with your code.
-Please don't change anything else other than these lines.
-
-2. USE OF JUPYTER NOTEBOOK: For those who would like to use Jupyter Notebook. You can copy and paste
-each function in the notebook environment, test your code their. However,
-remember to paste back your code in a .py file and ensure that its running
-okay.
-
-3. IDENTATION: Please make sure that you check your identation
-
-4. Returning things frm function: All the functions below have to return a value.
-Please dont forget to use the return statement to return a value.
-
-5. HINTS: please read my comments for hints and instructions where applicable
+1. Uncomment every line with  [YOUR CODE HERE] and replace it with your code
+2. In the functions, I use pass as a place holder, please replace
 """
 
 
 # import Python libraries if required
+import numpy as np
+import os
+
 
 def return_element_of_a_list(list_of_things, i):
     """
@@ -31,11 +21,7 @@ def return_element_of_a_list(list_of_things, i):
     :param i: Index of the item to return
     :return:
     """
-    # use list indexing to get the ith item
-    # [YOUR CODE HERE]
-
-    # return the item
-    # [YOUR CODE HERE]
+    return list_of_things[i]
 
 
 def calculate_average(list_of_numbers):
@@ -46,19 +32,8 @@ def calculate_average(list_of_numbers):
     :param list_of_numbers:A list of numbers
     :return:
     """
-
-    # calculate  the sum using for loop
-    # [YOUR CODE HERE]
-
-    # get the length of the list of numbers using list function len()
-    # [YOUR CODE HERE]
-
-    # finally calculate the mean
-    # [YOUR CODE HERE]
-
-    # return the mean
-    # [YOUR CODE HERE]
-
+    return np.mean(list_of_numbers)
+    
 
 def concatenate_strings(first_name, last_name):
     """
@@ -71,9 +46,8 @@ def concatenate_strings(first_name, last_name):
     :param last_name: A string variable for first name
     :return:
     """
-
     # use string concatenation to combine the two strings
-    # [YOUR CODE HERE]
+    return "{}{}".format(first_name, last_name)
 
 
 def check_if_list_contains_item(list_of_things, item):
@@ -87,12 +61,10 @@ def check_if_list_contains_item(list_of_things, item):
     :param item:
     :return:
     """
+    if item in list_of_things:
+        return 'YES'
 
-    # use if and other conditional statements to check for membership
-    # [YOUR CODE HERE]
-
-    # return your result
-    # [YOUR CODE HERE]
+    return 'NO'
 
 
 def count_number_of_csv_files(input_folder=None):
@@ -103,16 +75,20 @@ def count_number_of_csv_files(input_folder=None):
     """
 
     # use the os module to list all files in the folder and put them in a list
-    # [YOUR CODE HERE]
+    file_lst = os.listdir(input_folder)
 
     # use for loop, list indexing and if conditional statement to get the result
-    # [YOUR CODE HERE]
+    cnt_csv = 0
+
+    for f in file_lst:
+        if f[-3:] == 'csv':
+            cnt_csv += 1
 
     # return the result
-    # [YOUR CODE HERE]
+    return cnt_csv
 
 
-def save_list_to_csv_file(list=None, csvfile_full_path=None):
+def save_items_in_a_list_to_csv_file(list=None, csvfile_path=None):
     """
     Given a list (which can be nested), write elements of the list to a CSV file.
     Example
@@ -122,20 +98,25 @@ def save_list_to_csv_file(list=None, csvfile_full_path=None):
     like below:
     'a', 'X', 'z'
     '1', '2', '3'
-    :param list:
-    :param csvfile_full_path:
+    :param list: List with items to write. Note that it can be a nested list
+    :param csvfile_path: full path of CSV file, when testing, dont forget extension
     :return:
     """
-
     # to avoid some problems later, lets remove the file if it exist
     # use if statement and function 'remove' from os module
-
-
-    # use list indexing and object type checking
-    # see if the list is nested list or not
+    if os.path.exists(csvfile_path):
+        os.remove(csvfile_path)
 
     # open file object for writing
+    f = open(csvfile_path, "w+")
 
     # start writing
-
-    # close file object after writing
+    if type(list[0]) != list:
+        # convert all list elements into a single string
+        str = ','.join(list)
+        f.write(str)
+    else:
+        for r in list:
+            item = ','.join(r)
+            f.write(item)
+            f.write("\n")

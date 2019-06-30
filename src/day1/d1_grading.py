@@ -4,16 +4,29 @@ import time
 import shutil
 import numpy as np
 import pandas as pd
+import sys
+
+sys.path.append('/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/solution-notebooks/')
+
+try:
+    from solution-notebooks import d1_solution
+except ImportError:
+    pass
 
 
 DAY = 1
 MARKING_SCHEME = {'return_element_of_a_list': 2, 'calculate_average': 4,
-                  'concatenate_strings': 2, 'check_if_list_contains_item': 2}
+                  'concatenate_strings': 2, 'check_if_list_contains_item': 2,
+                  'save_list_to_csv_file':4, 'count_number_of_csv_files': 2}
+
 
 TEST_INPUTS = {'return_element_of_a_list': (['a', 'X', 'z', 10, 30], -1),
                'calculate_average': [i for i in range(10)],
                'concatenate_strings': ('Khama', 'Matekenya'),
-               'check_if_list_contains_item': (['Malawi', 'Zambia', 'Mozambique', 'Dunstan'], 'Senegal')}
+               'check_if_list_contains_item': (['Malawi', 'Zambia', 'Mozambique', 'Dunstan'], 'Senegal'),
+               'count_number_of_csv_files': '/Users/dmatekenya/Google-Drive/worldbank/freetown/data',
+               'save_list_to_csv_file': [["REG_NAME","REG_CODE","DIST_NAME","ADM_STATUS","DIST_CODE"],
+               ["Central","2","Ntchisi","Rural","203"]]}
 
 
 def get_responses_and_record(sol):
@@ -50,6 +63,24 @@ def get_responses_and_record(sol):
                 actual = 'NO'
 
             if output == actual:
+                total_marks += MARKING_SCHEME[k]
+        elif k == 'count_number_of_csv_files':
+            correct = d1_solution.count_number_of_csv_files(input_folder=v)
+            output = sol.count_number_of_csv_files(input_folder=v)
+            if output == correct:
+                total_marks += MARKING_SCHEME[k]
+        elif k == 'save_list_to_csv_file':
+            out_csv_d = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvDun.csv'
+            out_csv_p = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvP.csv'
+
+            d1_solution.save_list_to_csv_file(list=v, csvfile_full_path=out_csv_d)
+            sol.save_list_to_csv_file(list=v, csvfile_full_path=out_csv_p)
+
+            dfd = pd.read_csv(out_csv_d)
+            dfp = pd.read_csv(out_csv_p)
+
+            # check if they are the same
+            if dfd.shape[0] == dfp.shape[0]:
                 total_marks += MARKING_SCHEME[k]
 
     return total_marks
