@@ -1,8 +1,12 @@
 import os
+from importlib import reload
+import time
 import shutil
 import numpy as np
-import candidate_solutions as sol
+import pandas as pd
 
+
+DAY = 1
 MARKING_SCHEME = {'return_element_of_a_list': 2, 'calculate_average': 4,
                   'concatenate_strings': 2, 'check_if_list_contains_item': 2}
 
@@ -12,7 +16,7 @@ TEST_INPUTS = {'return_element_of_a_list': (['a', 'X', 'z', 10, 30], -1),
                'check_if_list_contains_item': (['Malawi', 'Zambia', 'Mozambique', 'Dunstan'], 'Senegal')}
 
 
-def get_responses_and_record():
+def get_responses_and_record(sol):
     total_marks = 0
     for k, v in TEST_INPUTS.items():
         # run function
@@ -51,25 +55,33 @@ def get_responses_and_record():
     return total_marks
 
 
-def mark_all_scripts(candidates_folder=None, results_file=None):
+def grade_scripts(candidates_solutions_folder=None):
 
-    lst = os.listdir(candidates_folder)
+    lst = os.listdir(candidates_solutions_folder)
     res = []
 
     for l in lst:
         try:
             # get students name
             first = l.split('_')[0]
-            last = l.split('_')[1]
+            last = l.split('_')[1][:-3]
 
             # copy module to mai folder and rename it
-            full_path = os.path.join(candidates_folder, l)
-            shutil.copy(full_path, 'candidate_solutions.py')
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            os.remove(os.path.join(current_dir, 'candidate_solutions.py'))
+            new_solutions_script_path = os.path.join(candidates_solutions_folder, l)
+            dest_file = os.path.join(current_dir, 'candidate_solutions.py')
+            shutil.copy(new_solutions_script_path, dest_file)
 
             # run script
-            res = get_responses_and_record()
+            import candidate_solutions as sol
+            sol = reload(sol)
+            score = get_responses_and_record(sol)
 
-            res.append({'firstName': first, 'lastName': last})
+            # print results
+            print('Participant name: {} {}, score: {}'.format(first, last, score))
+            res.append({'firstName': first, 'lastName': last, 'score': score, 'day': DAY,
+                        'totalScore': np.sum(list(MARKING_SCHEME.values()))})
         except Exception as e:
             print(e)
             continue
@@ -78,9 +90,12 @@ def mark_all_scripts(candidates_folder=None, results_file=None):
 
 
 def main():
-    marks = get_responses_and_record()
-    print(marks)
+    submissions_folder = "/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/exercise-submission/day1"
+    d1_scores = "/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/scores/day1.csv"
+    grades = grade_scripts(candidates_solutions_folder=submissions_folder)
+    df_grades = pd.DataFrame(grades)
+    df_grades.to_csv(d1_scores, index=False)
 
-
+    
 if __name__ == '__main__':
     main()
