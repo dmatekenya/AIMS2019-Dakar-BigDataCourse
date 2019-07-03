@@ -1,0 +1,13 @@
+Hadoop
+
+1. Overview and History
+- Hadoop definition
+- History
+- Evolution
+- Why Hadoop
+- hadoop vs databases
+
+2. Hadoop technologies and Ecosytem
+- Query engines
+- Core hadoop ecosystem
+- external data storage

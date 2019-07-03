@@ -23,59 +23,64 @@ TEST_INPUTS = {'return_element_of_a_list': (['a', 'X', 'z', 10, 30], -1),
 
 def get_responses_and_record(student_sol=None, sol=None):
     total_marks = 0
+    total_graded = 6
     for k, v in TEST_INPUTS.items():
         # run function
-        if k == 'return_element_of_a_list':
-            i = v[1]
-            lst = v[0]
-            output = student_sol.return_element_of_a_list(lst, i)
+        try:
+            if k == 'return_element_of_a_list':
+                i = v[1]
+                lst = v[0]
+                output = student_sol.return_element_of_a_list(lst, i)
 
-            # check if its correct
-            if output == lst[i]:
-                total_marks += MARKING_SCHEME[k]
-        elif k == 'calculate_average':
-            output = student_sol.calculate_average(v)
-            # check if its correct
-            if output == np.mean(v):
-                total_marks += MARKING_SCHEME[k]
-        elif k == 'concatenate_strings':
-            first = v[0]
-            last = v[1]
-            output = student_sol.concatenate_strings(first, last)
-            if output == "{}  {}".format(first, last):
-                total_marks += MARKING_SCHEME[k]
+                # check if its correct
+                if output == lst[i]:
+                    total_marks += MARKING_SCHEME[k]
+            elif k == 'calculate_average':
+                output = student_sol.calculate_average(v)
+                # check if its correct
+                if output == np.mean(v):
+                    total_marks += MARKING_SCHEME[k]
+            elif k == 'concatenate_strings':
+                first = v[0]
+                last = v[1]
+                output = student_sol.concatenate_strings(first, last)
+                if output == "{}  {}".format(first, last):
+                    total_marks += MARKING_SCHEME[k]
 
-        elif k == 'check_if_list_contains_item':
-            item = v[1]
-            lst = v[0]
-            output = student_sol.check_if_list_contains_item(lst, item)
-            if item in lst:
-                actual = 'YES'
-            else:
-                actual = 'NO'
+            elif k == 'check_if_list_contains_item':
+                item = v[1]
+                lst = v[0]
+                output = student_sol.check_if_list_contains_item(lst, item)
+                if item in lst:
+                    actual = 'YES'
+                else:
+                    actual = 'NO'
 
-            if output == actual:
-                total_marks += MARKING_SCHEME[k]
-        elif k == 'count_number_of_csv_files':
-            correct = sol.count_number_of_csv_files(input_folder=v)
-            output = student_sol.count_number_of_csv_files(input_folder=v)
-            if output == correct:
-                total_marks += MARKING_SCHEME[k]
-        elif k == 'save_list_to_csv_file':
-            out_csv_d = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvDun.csv'
-            out_csv_p = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvP.csv'
+                if output == actual:
+                    total_marks += MARKING_SCHEME[k]
+            elif k == 'count_number_of_csv_files':
+                correct = sol.count_number_of_csv_files(input_folder=v)
+                output = student_sol.count_number_of_csv_files(input_folder=v)
+                if output == correct:
+                    total_marks += MARKING_SCHEME[k]
+            elif k == 'save_list_to_csv_file':
+                out_csv_d = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvDun.csv'
+                out_csv_p = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day1-intro-to-python/data/listToCsvP.csv'
 
-            sol.save_list_to_csv(lst=v, csvfile_path=out_csv_d)
-            student_sol.save_list_to_csv(lst=v, csvfile_path=out_csv_p)
+                sol.save_list_to_csv(lst=v, csvfile_path=out_csv_d)
+                student_sol.save_list_to_csv(lst=v, csvfile_path=out_csv_p)
 
-            dfd = pd.read_csv(out_csv_d)
-            dfp = pd.read_csv(out_csv_p)
+                dfd = pd.read_csv(out_csv_d)
+                dfp = pd.read_csv(out_csv_p)
 
-            # check if they are the same
-            if dfd.shape[0] == dfp.shape[0]:
-                total_marks += MARKING_SCHEME[k]
+                # check if they are the same
+                if dfd.shape[0] == dfp.shape[0]:
+                    total_marks += MARKING_SCHEME[k]
+        except Exception as e:
+            total_graded -= 1
+            continue
 
-    return total_marks
+    return total_marks, total_graded
 
 
 def grade_scripts(candidates_solutions_folder=None):
@@ -115,7 +120,9 @@ def grade_scripts(candidates_solutions_folder=None):
                 score = get_responses_and_record(student_sol=student_sol, sol=sol)
 
                 # print results
-                print('Participant name: {} {}, score: {} out of {}'.format(first, last, score, TOTAL_SCORE))
+                print('Participant name: {} {}, score: {} out of {}, graded questions: {}'.format(first,
+                                                                                last, score[0], TOTAL_SCORE, score[1]))
+
                 res.append({'firstName': first, 'lastName': last, 'score': score, 'day': DAY,
                             'totalScore': TOTAL_SCORE})
         except Exception as e:
