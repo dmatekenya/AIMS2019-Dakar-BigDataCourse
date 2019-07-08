@@ -3,11 +3,11 @@
 # import Python libraries if required
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
 from textblob import TextBlob
 import nltk
 import requests
 from bs4 import BeautifulSoup
+import json
 
 # define a function, please call it: report_basic_data_properties
 # the function should take as input a CSV file, call the input
@@ -147,7 +147,7 @@ def clean_table_rows(tb_rows=None):
         # Remove white spaces-a little convuluted but it works
         clean_text2 = " ".join(clean_text.split())
 
-        # Remove brackts at beginning and end
+        # Remove brackets at beginning and end
         clean_text3 = clean_text2[1:-1]
 
         # Split using comma delimiter
@@ -185,5 +185,73 @@ def convert_website_table_to_csv(url=None, output_csv_file=None):
 
     # save the dataframe to CSV file
     df_men.to_csv(output_csv_file,index=False)
+
+
+def get_weather(api_key='cd689df7ce5a01db2aafde528e3d87c4', city_id=None):
+    """
+    Returns weather
+    :param api_key:
+    :param city_name:
+    :return:
+    """
+    url = "http://api.openweathermap.org/data/2.5/forecast?id={}&APPID={}".format(city_id, api_key)
+    r = requests.get(url)
+    return r.json()
+
+
+def compile_weather_forecast(city_name=None, output_csv_file=None):
+    """
+    Get weather forecasts for Dakar. Please get only TEMPERATURE and HUMIDITY
+    Useful Info:
+    city_details_file: day2-python-for-data-science/data/city.list.json
+    :param your_api_key:
+    :param output_csv_file:
+    :return:
+    """
+    # API key
+    API_KEY = 'cd689df7ce5a01db2aafde528e3d87c4'
+
+    # JSON file with city details
+    jfile = '/Users/dmatekenya/Google-Drive/gigs/aims-dakar-2019/day2-python-for-data-science/data/city.list.json'
+    # load city details file
+    with open(jfile) as f:
+        data = json.load(f)
+
+    # get the city ID
+    city_code = None
+    for c in data:
+        if c['name'] == city_name:
+            city_code = c['id']
+
+    # now get the weather forecast
+    weather_json = get_weather(api_key=API_KEY, city_id=city_code)
+
+    # put weather items in a list
+    weather_items = weather_json['list']
+
+    # save into a dataframe
+    data = []
+
+    for i in weather_items:
+        ts = i['dt_txt']
+        temp = i['main']['temp']
+        hum = i['main']['humidity']
+        rains = i.get('rain', 'No rain')
+        clouds = i.get('clouds')['all']
+
+        data_item = {'forecastTime': ts, 'tempK': temp,
+                     'humidity': hum, "rain": rains,
+                     'cloudsPercent': clouds}
+        data.append(data_item)
+
+    # create dataframe
+    df = pd.DataFrame(data)
+
+    # save dataframe
+    df.to_csv(output_csv_file, index=False)
+
+
+    
+
 
 

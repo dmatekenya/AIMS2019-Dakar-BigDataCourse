@@ -9,7 +9,8 @@ DAY = 1
 MARKING_SCHEME = {'return_element_of_a_list': 2, 'calculate_average': 4,
                   'concatenate_strings': 2, 'check_if_list_contains_item': 2,
                   'save_list_to_csv_file':4, 'count_number_of_csv_files': 2}
-TOTAL_SCORE = np.sum(list(MARKING_SCHEME.values()))
+TOT_SCORE = np.sum(list(MARKING_SCHEME.values()))
+TOT_QNS = len(MARKING_SCHEME)
 
 
 TEST_INPUTS = {'return_element_of_a_list': (['a', 'X', 'z', 10, 30], -1),
@@ -98,13 +99,19 @@ def grade_scripts(candidates_solutions_folder=None):
     
     lst = os.listdir(candidates_solutions_folder)
     res = []
-
+    total_submissions = 0
     for l in lst:
         try:
             if l.endswith('py'):
+                total_submissions += 1
+
                 # get students name
+                print()
                 first = l.split('_')[0]
                 last = l.split('_')[1][:-3]
+                print('========================================')
+                print('Grading: {} {}'.format(first, last))
+                print('========================================')
 
                 # copy module to mai folder and rename it
                 if os.path.exists(os.path.join(current_dir, 'candidate_solutions.py')):
@@ -120,16 +127,19 @@ def grade_scripts(candidates_solutions_folder=None):
                 score = get_responses_and_record(student_sol=student_sol, sol=sol)
 
                 # print results
-                print('Participant name: {} {}, score: {} out of {}, graded questions: {}'.format(first,
-                                                                                last, score[0], TOTAL_SCORE, score[1]))
+                print('Score: {}/{}, number of questions graded: {}/{}'.format(score[0], TOT_SCORE, score[1], TOT_QNS))
 
                 res.append({'firstName': first, 'lastName': last, 'score': score, 'day': DAY,
-                            'totalScore': TOTAL_SCORE})
+                            'totalScore': TOT_SCORE})
         except Exception as e:
+            print("GRADING FAILED DUE TO ERROR DESCRIBED BELOW")
             print(e)
-            print('FAILED TO GRADE THE THIS PARTICIPANT: {} {}'.format(first, last))
             continue
 
+    print()
+    print('***********************************************************')
+    print('TOTAL PARTICIPANTS GRADED {}'.format(total_submissions))
+    print('***********************************************************')
     return res
 
 

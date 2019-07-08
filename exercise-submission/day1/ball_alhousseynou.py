@@ -114,14 +114,13 @@ def count_number_of_csv_files(input_folder=None):
     import os
     alllist=[]
     csv=0
-    folder = input_folder
-    folders=os.listdir(folder)
-    #for f in folders:
-    #     alllist.append(f)
+    folders=os.listdir(input_folder)
+    for f in folders:
+        alllist.append(f)
 
     # use for loop, list indexing and if conditional statement to get the result
-    for f in folders:
-        ext = f(-3:).lower()
+    for f in alllist:
+        ext = f[-3:].lower()
         if ext == "csv":
             csv+=1
 

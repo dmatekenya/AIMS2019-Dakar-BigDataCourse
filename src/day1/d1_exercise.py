@@ -32,10 +32,10 @@ def return_element_of_a_list(list_of_things, i):
     :return:
     """
     # use list indexing to get the ith item
-    # [YOUR CODE HERE]
+    element =  list_of_things[i]
 
     # return the item
-    # [YOUR CODE HERE]
+    return element
 
 
 def calculate_average(list_of_numbers):

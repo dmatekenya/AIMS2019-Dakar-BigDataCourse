@@ -46,7 +46,7 @@ def concatenate_strings(first_name, last_name):
     :return:
     """
     # use string concatenation to combine the two strings
-    return "{} {}".format(first_name, last_name)
+    return "{}{}".format(first_name, last_name)
 
 
 def check_if_list_contains_item(list_of_things, item):
